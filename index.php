@@ -53,7 +53,7 @@ $list_sites = getSites();
 				        <div class="form-group" id="site-select">
 							<label for="site" class="control-label">Site pour inventaire</label>
 							<select class="form-control" id="site" name="site">
-								<option value="" disabled selected>Sélectionner un site</option>
+								<option value="" disabled selected>Sélectionner le site à inventorier</option>
 								<?php
 									foreach ($list_sites as $sites)
 									{
@@ -72,6 +72,10 @@ $list_sites = getSites();
 						<div class="alert alert-danger" role="alert" style="display:<?php echo $siteError ?>;">
 			                <span class="glyphicon glyphicon-exclamation-sign"></span>
 			                <span>Veuillez sélectionner un site</span>
+                        </div>
+                        <div class="alert alert-danger" role="alert" style="display:<?php echo $siteAllowedError ?>;">
+			                <span class="glyphicon glyphicon-exclamation-sign"></span>
+			                <span>Mauvais site sélectionné</span>
 			            </div>
 				        <div class="form-group">
 				            <button id="button-connect" type="submit" class="btn btn-info pull-right">Se connecter</button>

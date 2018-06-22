@@ -12,7 +12,7 @@ require('includes/header.php');
 		<section id="free-input-area">
 			<div class="loader"></div>
 			<div class="container">
-				<h1>Saisie libre :</h1>
+				<h2>Saisie de produits non-suivis en stock sur <span class="infos-title"><?php echo $_SESSION['site']; ?></span> :</h2>
 				<form method="post" class="well" id="add-free-form" action="">
 					<div class="row">
 						<div class="form-group col-md-2" id="add-free-loc">
@@ -59,7 +59,7 @@ require('includes/header.php');
 		<!-- Liste des produits saisis du formulaire -->
 		<section id="products-area">
 			<div class="container">	
-				<h1>Produits saisis :</h1>
+				<h2>Produits non-suivis en stock saisis sur <span class="infos-title"><?php echo $_SESSION['site']; ?></span> par <span class="infos-user"><?php echo getUsernameByAlias($_SESSION['user-alias']); ?></span> :</h2>
 				<table class="table table-striped nowrap" id="table-free-input" cellspacing="0" width="100%">
 					<thead>
 						<tr>
@@ -88,8 +88,8 @@ require('includes/header.php');
 								echo	'<td>' . $list['status'] . '</td>';
 								echo	'<td>' . $list['observations'] . '</td>';
 								echo	'<td>
-											<button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#modal-free-change" data-backdrop="false" data-id="' . $list['id'] . '" data-tooltip="tooltip" data-placement="top" title="Modifier"><span class="glyphicon glyphicon-pencil"></span></button>
-											<button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modal-free-delete" data-backdrop="false" data-id="' . $list['id'] . '" data-tooltip="tooltip" data-placement="top" title="Supprimer"><span class="glyphicon glyphicon-remove"></span></button>
+											<button type="button" class="btn btn-sm btn-table btn-primary" data-toggle="modal" data-target="#modal-free-change" data-backdrop="false" data-id="' . $list['id'] . '" data-tooltip="tooltip" data-placement="top" title="Modifier"><span class="glyphicon glyphicon-pencil"></span></button>
+											<button type="button" class="btn btn-sm btn-table btn-danger" data-toggle="modal" data-target="#modal-free-delete" data-backdrop="false" data-id="' . $list['id'] . '" data-tooltip="tooltip" data-placement="top" title="Supprimer"><span class="glyphicon glyphicon-remove"></span></button>
 										</td>
 									</tr>';
 							}

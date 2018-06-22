@@ -33,11 +33,11 @@ if ( !checkIfLocationExist($location) || empty($location) )
 }
 
 // Contrôle référence
-if ( empty($reference) )
-{
-	$array["isSuccess"] = false;
-	$array["refError"] = "Référence non-valide";
-}
+// if ( empty($reference) )
+// {
+// 	$array["isSuccess"] = false;
+// 	$array["refError"] = "Référence non-valide";
+// }
 
 // Contrôle désignation
 if ( empty($designation) )

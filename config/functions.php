@@ -37,7 +37,7 @@ function array_to_csv(array $datas, $site)
 
     $handle    = 'csv/inventory_' . $site . '.csv';
     $tmp 	   = fopen($handle, 'w+');
-    $delimiter = ';';
+    $delimiter = "\t";
     $enclosure = '*';
     
     foreach( $datas as $data )

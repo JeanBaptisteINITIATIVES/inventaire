@@ -29,24 +29,6 @@
 						</a>
 					</div>
 					<div class="collapse navbar-collapse" id="navbar-inventory">
-						<button type="button" id="update-nav" class="btn" data-toggle="modal" data-target="#modal-update">Synchro produits Scorre</button>	
-						<div class="modal fade" tabindex="-1" role="dialog" id="modal-update">
-							<div class="modal-dialog modal-md" role="document">
-								<div class="modal-content">
-									<div class="modal-header">
-										<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times</span></button>
-										<h2>Synchro Scorre</h2>
-									</div>
-									<div class="modal-body">
-										<p>Mettre à jour la base de données des produits ?</p>
-									</div>
-									<div class="modal-footer">
-										<button type="button" class="btn btn-sm btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Annuler</button>
-										<button type="button" id="update-button" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-ok"></span> Valider</button>
-									</div>
-								</div>
-							</div>
-						</div>
 						<ul class="nav navbar-nav navbar-right">
 							<li class="infos-log info-user">
 								<p>Connecté : <span class="infos-coul"><?php echo getUsernameByAlias($_SESSION['user-alias']); ?></span></p>
@@ -64,6 +46,105 @@
 		<!-- Formulaire de recherche -->
 		<section id="search-input">
 			<div class="loader"></div>
+            <div class="container" id="admin-actions">
+                <h1>Actions</h1>
+                <button type="button" class="btn btn-info" id="update-nav" data-toggle="modal" data-target="#modal-update"><span class="glyphicon glyphicon-refresh"></span> Synchro Scorre</button>
+				<button type="button" class="btn btn-warning" id="delete-nav" data-toggle="modal" data-target="#modal-remove"><span class="glyphicon glyphicon-remove"></span> Effacer saisies</button>
+                <button type="button" class="btn btn-danger" id="import-nav" data-toggle="modal" data-target="#modal-import"><span class="glyphicon glyphicon-download-alt"></span> Importer données</button>
+                <p id="import-help"><?php echo $error = isset($_SESSION["error"]) ? $_SESSION["error"] : ""; ?></p>
+                <p id="import-final-message"><?php echo $final_message = isset($_SESSION["final-message"]) ? $_SESSION["final-message"] : ""; ?></p>
+                <div class="modal fade" tabindex="-1" role="dialog" id="modal-update">
+                    <div class="modal-dialog modal-md" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times</span></button>
+                                <h2>Synchro des produits Scorre</h2>
+                            </div>
+                            <div class="modal-body">
+                                <p>Mettre à jour la base de données des produits ?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Annuler</button>
+                                <button type="button" id="update-button" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-ok"></span> Valider</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" tabindex="-1" role="dialog" id="modal-remove">
+                    <div class="modal-dialog modal-md" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times</span></button>
+                                <h2>Reset des saisies de l'inventaire</h2>
+                            </div>
+                            <div class="modal-body">
+                                <p>Vider les tables et les utilisateurs concernant toutes les saisies de l'inventaire ?</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Annuler</button>
+                                <button type="button" id="remove-button" class="btn btn-sm btn-success"><span class="glyphicon glyphicon-ok"></span> Valider</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" tabindex="-1" role="dialog" id="modal-import">
+                    <div class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times</span></button>
+                                <h2>Importation de données externes</h2>
+                            </div>
+                            <div class="modal-body">
+                                <form method="post" action="" id="import-form" enctype="multipart/form-data">
+                                    <h3 id="import-title">Importer les données inventoriée du site <?php echo "<span id='span-import'>" . $_SESSION['site'] . "</span>"; ?> :</h3>
+                                    <div class="row">
+                                        <div class="form-group col-md-4">
+                                            <label for="import-file">Choisir un fichier  *.csv</label>
+                                            <input type="file" name="import-file" id="import-file" />
+                                        </div>
+                                        <div class="form-group col-md-8">
+                                            <p id="help-info-import">Le fichier .csv doit comporter les champs suivants :<br />
+                                                • référence (suivie en stock)<br />
+                                                • quantité<br />
+                                                • statut<br />
+                                                • observations</p>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="form-group col-md-4">
+                                            <label for="user" class="control-label">Référent de cet inventaire</label>
+                                            <select class="form-control" id="user" name="user">
+                                                <option value="" disabled selected>Sélectionner un utilisateur</option>
+                                                <?php
+                                                    foreach ($list_users as $user_import)
+                                                    {
+                                                        if ( $user_import['name'] === $user_import )
+                                                        {
+                                                            echo '<option value="' . $user_import . '" selected>' . $user_import . '</option>';
+                                                        }
+                                                        else
+                                                        {
+                                                            echo '<option value="' . $user_import['name'] . '">' . $user_import['name'] . '</option>';
+                                                        }
+                                                    }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-md-8">
+                                            <button type="submit" id="import-button" class="btn btn-sm btn-success">
+                                                <span class="glyphicon glyphicon-ok"></span> Importer
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-sm btn-default" data-dismiss="modal"><span class="glyphicon glyphicon-remove"></span> Annuler</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 			<div class="container" id="display-entry">
 				<h1>Afficher les saisies :</h1>
 				<form method="post" class="col-lg-6 col-md-6 well well-lg" id="admin-input-form" action="">

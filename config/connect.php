@@ -5,7 +5,7 @@ require_once('config.php');
 $_SESSION = array();
 
 // Initialisation des messages d'erreurs
-$userAliasError = $passwordError = $siteError = "none";
+$userAliasError = $passwordError = $siteError = $siteAllowedError = "none";
 
 
 if( $_SERVER["REQUEST_METHOD"] == "POST" )
@@ -27,7 +27,30 @@ if( $_SERVER["REQUEST_METHOD"] == "POST" )
 	}
 	else
 	{
-	    $user_alias    = checkInput($_POST['user-alias']);
+        $user_alias = checkInput($_POST['user-alias']);
+        switch ($user_alias) {
+            case 'che1':
+                $site_allowed = ["CHERRIER"];
+                break;
+            case 'che2':
+                $site_allowed = ["CHERRIER"];
+                break;
+            case 'che3':
+                $site_allowed = ["CHERRIER"];
+                break;
+            case 'bj':
+                $site_allowed = ["BOIS JOLI"];
+                break;
+            case 'gm':
+                $site_allowed = ["GUETTE MIDI"];
+                break;
+            case 'ct':
+                $site_allowed = ["CATMANOR"];
+                break;
+            default:
+                $site_allowed = [];
+                break;
+        }
 	    $user_level    = (int) getUserLevel($_POST['user-alias']);
 	    $user_password = getUserPassword($_POST['user-alias']);
 	    
@@ -47,20 +70,26 @@ if( $_SERVER["REQUEST_METHOD"] == "POST" )
 
 	if ( empty($_POST['password']) || !in_array($_POST['password'], $allowed_pwds) )
 	{
-	    	$userIsLoggedIn = false;
-	    	$passwordError = 'block';
+        $userIsLoggedIn = false;
+        $passwordError = 'block';
 	}
 
 	if ( !isset($_POST['site']) )
 	{
 	    $siteError = 'block';
 	    $userIsLoggedIn = false;
-	}
+    }
 	else
 	{
 	    $postData = explode('|', $_POST['site']);
 	    $site_id  = intval($postData[0]);
-	    $site     = $postData[1];
+        $site     = $postData[1];
+        
+        if ( $site != $site_allowed[0] && !empty($site_allowed) )
+        {
+            $siteAllowedError = 'block';
+            $userIsLoggedIn = false;
+        }
 	}
 
 	if ( $user_level >= 2 && $_POST['password'] === PASSWORD_CONTROL )
@@ -80,10 +109,11 @@ if( $_SERVER["REQUEST_METHOD"] == "POST" )
 	    	session_start();
 	    	$_SESSION['user-alias'] = $user_alias;
 	    	$_SESSION['site_id']    = $site_id;
-	    	$_SESSION['user-level'] = $user_level;
+            $_SESSION['user-level'] = $user_level;
+            $_SESSION['power-site-id'] = true;
 
 	    	// Contrôle de l'existence de l'utilisateur en bdd
-		    $check_user = checkIfUserExist($user_alias, $site_id) ? updateUser($user_alias, $site_id) : insertNewUser($user_alias, $site_id);
+		    $check_user = checkIfPowerUserExist($user_alias) ? updatePowerUser($user_alias) : insertNewPowerUser($user_alias);
 
 	    	header('Location: checkInputs.php');
 	    	exit();
@@ -92,10 +122,12 @@ if( $_SERVER["REQUEST_METHOD"] == "POST" )
 	    {
 	    	session_start();
 	    	$_SESSION['user-alias'] = $user_alias;
-	    	$_SESSION['site_id'] = $site_id;
-	    	$_SESSION['user-level'] = $user_level;
+            $_SESSION['site_id'] = $site_id;
+            $_SESSION['site'] = $site;
+            $_SESSION['user-level'] = $user_level;
+            $_SESSION['power-site-id'] = true;
 
-		    $check_user = checkIfUserExist($user_alias, $site_id) ? updateUser($user_alias, $site_id) : insertNewUser($user_alias, $site_id);
+		    $check_user = checkIfPowerUserExist($user_alias) ? updatePowerUser($user_alias) : insertNewPowerUser($user_alias);
 
 	    	header('Location: admin/admin.php');
 	    	exit();

@@ -12,7 +12,7 @@ require('includes/header.php');
 		<section id="input-area">
 			<div class="loader"></div>
 			<div class="container">
-				<h1>Saisie produit suivi en stock :</h1>
+				<h2>Saisie de produits suivis en stock sur <span class="infos-title"><?php echo $_SESSION['site']; ?></span> :</h2>
 				<form method="post" class="well" id="add-form" action="">
 					<div class="row">
 						<div class="form-group col-md-2" id="add-loc">
@@ -61,7 +61,7 @@ require('includes/header.php');
 		<!-- Liste des produits saisis du formulaire -->
 		<section id="products-area">
 			<div class="container">	
-				<h1>Produits saisis :</h1>
+				<h2>Produits suivis saisis sur <span class="infos-title"><?php echo $_SESSION['site']; ?></span> par <span class="infos-user"><?php echo getUsernameByAlias($_SESSION['user-alias']); ?></span> :</h2>
 				<table class="table table-striped nowrap" id="table-stock-input" cellspacing="0" width="100%">
 					<thead>
 						<tr>

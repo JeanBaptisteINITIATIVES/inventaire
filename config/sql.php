@@ -1,7 +1,7 @@
 <?php
 
 // -----------------------------------------------------------------------
-// Vérification de l'existence de l'utilisateur à la connexion
+// Vérification de l'existence de l'utilisateur qui inventorie à la connexion
 // -----------------------------------------------------------------------
 function checkIfUserExist($alias, $site_id)
 {
@@ -11,10 +11,40 @@ function checkIfUserExist($alias, $site_id)
     					 FROM allowed_users AS au
     					 INNER JOIN users AS u
     					 ON au.id = u.allowed_users_id
-    					 WHERE au.alias = :username AND u.site_id = :site');
+    					 WHERE au.alias = :username AND u.site_id = :site_id');
 	
 	$req->bindParam(':username', $alias, PDO::PARAM_STR);
-	$req->bindParam(':site', $site_id, PDO::PARAM_INT);
+	$req->bindParam(':site_id', $site_id, PDO::PARAM_INT);
+	
+	$req->execute();
+
+	if ( $req->fetch() )
+	{
+		return true;
+	}
+	else
+	{ 
+		return false;
+	}
+
+	$req->closeCursor();
+}
+
+
+// -----------------------------------------------------------------------
+// Vérification de l'existence de l'utilisateur poweruser à la connexion
+// -----------------------------------------------------------------------
+function checkIfPowerUserExist($alias)
+{
+	global $db;
+
+	$req = $db->prepare('SELECT au.alias, u.site_id
+    					 FROM allowed_users AS au
+    					 INNER JOIN users AS u
+    					 ON au.id = u.allowed_users_id
+    					 WHERE au.alias = :username AND u.site_id IS NULL');
+	
+	$req->bindParam(':username', $alias, PDO::PARAM_STR);
 	
 	$req->execute();
 
@@ -182,6 +212,29 @@ function checkIfInputExist($location_id, $product_id, $status, $user_id)
 // -----------------------------------------------------------------------
 // Récupération du niveau d'authorisation de l'utilisateur
 // -----------------------------------------------------------------------
+function getDesignation($reference)
+{
+    global $db;
+
+	$req = $db->prepare('SELECT designation
+						 FROM products
+						 WHERE reference = :reference');
+
+	$req->bindParam(':reference', $reference, PDO::PARAM_STR);
+
+	$req->execute();
+
+	$result = $req->fetch();
+
+	$req->closeCursor();
+
+	return $result['designation'];
+}
+
+
+// -----------------------------------------------------------------------
+// Récupération du niveau d'authorisation de l'utilisateur
+// -----------------------------------------------------------------------
 function getUserLevel($alias)
 {
 	global $db;
@@ -199,6 +252,28 @@ function getUserLevel($alias)
 	$req->closeCursor();
 
 	return $result['user_level'];
+}
+
+
+// -----------------------------------------------------------------------
+// Récupération des utilisateurs autorisés
+// -----------------------------------------------------------------------
+function getAllowedUsers()
+{
+	global $db;
+
+	$list_users = array();
+
+	$req = $db->query('SELECT name FROM allowed_users');
+
+	while ( $row = $req->fetch() )
+	{
+		$list_users[] = $row;
+	}
+
+	$req->closeCursor();
+
+	return $list_users;
 }
 
 
@@ -222,6 +297,29 @@ function getUsernameByAlias($alias)
 	$req->closeCursor();
 
 	return $result['name'];
+}
+
+
+// -----------------------------------------------------------------------
+// Récupération de l'alias associé au nom
+// -----------------------------------------------------------------------
+function getAliasByName($user)
+{
+	global $db;
+
+	$req = $db->prepare('SELECT alias
+						 FROM allowed_users
+						 WHERE name = :user');
+
+	$req->bindParam(':user', $user, PDO::PARAM_STR);
+
+	$req->execute();
+
+	$result = $req->fetch();
+
+	$req->closeCursor();
+
+	return $result['alias'];
 }
 
 
@@ -270,6 +368,7 @@ function getSites()
 
 	return $list_sites;
 }
+
 
 
 // -----------------------------------------------------------------------
@@ -510,6 +609,32 @@ function getUserId($alias, $site_id)
 
 
 // -----------------------------------------------------------------------
+// Récupération de l'ID de l'utilisateur extérieur
+// -----------------------------------------------------------------------
+// function getPowerUserId($alias)
+// {
+// 	global $db;
+
+// 	$req = $db->prepare('SELECT au.alias, u.id AS id, u.site_id
+//     					 FROM allowed_users AS au
+//     					 INNER JOIN users AS u
+//     					 ON au.id = u.allowed_users_id
+//     					 WHERE au.alias = :alias AND u.site_id = :site_id');
+
+// 	$req->bindParam(':alias', $alias, PDO::PARAM_STR);
+// 	$req->bindParam(':site_id', $site_id, PDO::PARAM_INT);
+
+// 	$req->execute();
+
+// 	$result = $req->fetch();
+
+// 	return $result['id'];
+
+// 	$req->closeCursor();
+// }
+
+
+// -----------------------------------------------------------------------
 // Récupération des utilisateurs pour un site
 // -----------------------------------------------------------------------
 function getUsersIdOnSite($site_id)
@@ -648,19 +773,39 @@ function getUserPassword($user_alias)
 
 
 // -----------------------------------------------------------------------
-// Insertion infos de connexion de l'utilisateur en bdd
+// Insertion infos de connexion de l'utilisateur qui inventorie en bdd
 // -----------------------------------------------------------------------
 function insertNewUser($alias, $site_id)
 {
 	global $db;
 
 	$req = $db->prepare('INSERT INTO users(allowed_users_id, site_id, date_connection, online, last_activity)
-					     SELECT allowed_users.id, :site, NOW(), 1, NOW()
+					     SELECT allowed_users.id, :site_id, NOW(), 1, NOW()
 					     FROM allowed_users
 					     WHERE allowed_users.id = (SELECT id FROM allowed_users WHERE alias = :username)');
     
     $req->bindParam(':username', $alias, PDO::PARAM_STR);
-    $req->bindParam(':site', $site_id, PDO::PARAM_INT);
+    $req->bindParam(':site_id', $site_id, PDO::PARAM_INT);
+    
+    $req->execute();
+
+    $req->closeCursor();
+}
+
+
+// -----------------------------------------------------------------------
+// Insertion infos de connexion de l'utilisateur contrôle ou admin en bdd
+// -----------------------------------------------------------------------
+function insertNewPowerUser($alias)
+{
+	global $db;
+
+	$req = $db->prepare('INSERT INTO users(allowed_users_id, site_id, date_connection, online, last_activity)
+					     SELECT allowed_users.id, NULL, NOW(), 1, NOW()
+					     FROM allowed_users
+					     WHERE allowed_users.id = (SELECT id FROM allowed_users WHERE alias = :username)');
+    
+    $req->bindParam(':username', $alias, PDO::PARAM_STR);
     
     $req->execute();
 
@@ -723,7 +868,7 @@ function insertFreeInput($reference, $designation, $quantity, $status, $observat
 
 
 // -----------------------------------------------------------------------
-// Mise à jour infos de connexion utilisateur en bdd
+// Mise à jour infos de connexion utilisateur qui inventorie en bdd
 // -----------------------------------------------------------------------
 function updateUser($alias, $site_id)
 {
@@ -746,9 +891,31 @@ function updateUser($alias, $site_id)
 
 
 // -----------------------------------------------------------------------
+// Mise à jour infos de connexion utilisateur poweruser en bdd
+// -----------------------------------------------------------------------
+function updatePowerUser($alias)
+{
+	global $db;
+
+	$req = $db->prepare('UPDATE users
+						 INNER JOIN allowed_users
+						 ON users.allowed_users_id = allowed_users.id
+						 SET date_connection = NOW(), online = 1, last_activity = NOW()
+						 WHERE allowed_users_id = (SELECT id FROM allowed_users WHERE alias = :alias)
+						 AND site_id IS NULL');
+			
+	$req->bindParam(':alias', $alias, PDO::PARAM_STR);
+	
+	$req->execute();
+
+	$req->closeCursor();
+}
+
+
+// -----------------------------------------------------------------------
 // déconnexion de l'utilisateur en bdd
 // -----------------------------------------------------------------------
-function disconnectUser($alias)
+function disconnectUser($alias, $site_id)
 {
 	global $db;
 
@@ -756,14 +923,39 @@ function disconnectUser($alias)
 						 SET online = 0
 						 WHERE allowed_users_id = (SELECT id
 						 						   FROM allowed_users
-						 						   WHERE alias = :alias)');
+                                                    WHERE alias = :alias)
+                         AND site_id = :site_id');
 	
-	$req->bindParam(':alias', $alias, PDO::PARAM_STR);
+    $req->bindParam(':alias', $alias, PDO::PARAM_STR);
+	$req->bindParam(':site_id', $site_id);    
 	
 	$req->execute();
 
 	$req->closeCursor();
 }
+
+
+// -----------------------------------------------------------------------
+// déconnexion de l'utilisateur poweruser en bdd
+// -----------------------------------------------------------------------
+function disconnectPowerUser($alias)
+{
+	global $db;
+
+	$req = $db->prepare('UPDATE users
+						 SET online = 0
+						 WHERE allowed_users_id = (SELECT id
+						 						   FROM allowed_users
+                                                    WHERE alias = :alias)
+                         AND site_id IS NULL');
+	
+    $req->bindParam(':alias', $alias, PDO::PARAM_STR);
+	
+	$req->execute();
+
+	$req->closeCursor();
+}
+
 
 
 // -----------------------------------------------------------------------
@@ -810,5 +1002,3 @@ function updateLastActivity($alias)
 
 	$req->closeCursor();
 }
-
-?>

@@ -202,7 +202,7 @@ $(function() {
 	$('#update-button').on('click', function (e) {
 		e.preventDefault();
 		$.ajax({
-			type: 'GET',
+			type: 'POST',
 			url: '../../config/api.php',
 			beforeSend: function() {
 				$('#modal-update').fadeOut();
@@ -210,10 +210,14 @@ $(function() {
 			},
 			complete: function() {
 				location.reload();
-			}
+            }
+            // success: function() {
+			// 	$('#modal-remove').fadeOut();
+			// 	location.reload();
+		 	// }
 		});
-	});
-	
+    });
+    
 
 	// Focus après ouverture des modals
 	$('#modal-change').on('shown.bs.modal', function(e) {
@@ -226,6 +230,10 @@ $(function() {
 
 	$('#modal-update').on('shown.bs.modal', function (e) {
 		$('#update-button').focus();
+    });
+    
+    $('#modal-remove').on('shown.bs.modal', function (e) {
+		$('#remove-button').focus();
 	});
 
 	// On enlève les messages d'erreur à la fermeture du modal de modification
@@ -246,6 +254,10 @@ $(function() {
 	});
 
 	$('#csv').on('focus', function() {
+        $(this).blur();
+    });
+    
+    $('#update-nav, #delete-nav, #import-nav').on('focus', function() {
         $(this).blur();
 	});
 
@@ -429,7 +441,27 @@ $(function() {
 				location.reload();
 		 	}
 		});
-	});
+    });
+    
+    // Modal de suppression des produits en base de données
+	$('#remove-button').on('click', function (e) {
+		e.preventDefault();
+		$.ajax({
+			type: 'POST',
+			url: '../../ajax/removeInputs.php',
+			beforeSend: function() {
+				$('#modal-remove').fadeOut();
+				$('.loader').fadeIn();
+			},
+			complete: function() {
+				location.reload();
+            }
+            // success: function() {
+			// 	$('#modal-remove').fadeOut();
+			// 	location.reload();
+		 	// }
+		});
+    });
 
 
 	

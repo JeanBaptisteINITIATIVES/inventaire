@@ -136,6 +136,11 @@ table, table thead tr th
     font-size: 16px;
 }
 
+.infos-title {
+    font-style: normal;
+    color: #c30008;
+}
+
 .infos-search
 {
     font-style: normal;
@@ -150,6 +155,10 @@ table, table thead tr th
 .info-user
 {
     margin-right: 5px;
+}
+
+.infos-user {
+    color: #68a638;
 }
 
 .infos-log p
@@ -296,16 +305,44 @@ h1, h2, h3
 
 #update-nav
 {
-	border: 0;
-	background-color: transparent;
-	margin-top: 10px;
-	color: #888;
-	transition: all 0.2s ease-in 0s;
+	margin-right: 20px;
 }
 
-#update-nav:hover, #update-nav:focus
-{
-    color: #000;
+#admin-actions {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+#import-title {
+    margin-top: 5px;
+    margin-bottom: 20px;
+}
+
+#import-help {
+    margin-top: 15px;
+    color: #c30008;
+}
+
+#import-final-message {
+    margin-top: 15px;
+    color: #68a638;
+}
+
+#span-import {
+    color: #da0000;
+    font-size: 32px;
+}
+
+#import-button {
+    margin-top: 26px;
+}
+
+#help-info-import {
+    color: #004df3;
+}
+
+#delete-nav {
+    margin-right: 20px;
 }
 
 .btn-default

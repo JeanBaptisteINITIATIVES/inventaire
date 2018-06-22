@@ -3,7 +3,15 @@ session_start();
 
 require_once('load.php');
 
-disconnectUser($_SESSION['user-alias']);
+if ( $_SESSION['power-site-id'] )
+{
+    disconnectPowerUser($_SESSION['user-alias']);
+    disconnectUser($_SESSION["user-alias-import"], $_SESSION['site_id']);
+}
+else
+{
+    disconnectUser($_SESSION['user-alias'], $_SESSION['site_id']);
+}
 
 unset($_SESSION);
 session_destroy();

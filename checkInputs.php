@@ -2,7 +2,7 @@
 session_start();
 
 require('config/load.php');
-require('config/session.php');
+// require('config/session.php');
 require('includes/checkInputs.inc.php');
 
 ?>
@@ -82,10 +82,10 @@ require('includes/checkInputs.inc.php');
 						</div>
 						<div class="form-group">
 							<div class="radio-inline">
-								<label for="tracked"><input type="radio" id="tracked" name="tracking" value="stock" checked="checked" />suivi en stock</label>
+								<label for="tracked"><input type="radio" id="tracked" name="tracking" value="suivis en stock" checked="checked" />suivi en stock</label>
 							</div>
 							<div class="radio-inline">
-								<label for="not-tracked"><input type="radio" id="not-tracked" name="tracking" value="no-stock" />non suivi en stock</label>
+								<label for="not-tracked"><input type="radio" id="not-tracked" name="tracking" value="non-suivis en stock" />non suivi en stock</label>
 							</div>
 						</div>
 						<div class="form-group">
@@ -98,7 +98,7 @@ require('includes/checkInputs.inc.php');
 
 		<section id="search-control-results">
 			<div class="container">	
-				<h1>Résultats <?php if( isset($search_site) ) { echo $search_site; } ?></span><?php if( isset($search_ref) ) { echo $search_ref; } ?></span></h1>
+				<h2>Résultats <?php if( isset($search_site) ) { echo $search_site; } ?></span><?php if( isset($search_track) ) { echo $search_track; } ?></span><?php if( isset($search_ref) ) { echo $search_ref; } ?></span></h2>
 				<table class="table table-striped nowrap" id="table-control" cellspacing="0" width="100%">
 					<thead>
 						<tr>
